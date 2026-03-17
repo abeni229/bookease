@@ -19,7 +19,7 @@
         }
 
         .btn-primary {
-            background: #006BFF;
+            background: #1E3A8A;
             color: white;
             transition: all 0.2s;
         }
@@ -34,13 +34,13 @@
             border: 1px solid #F0F0F0;
         }
         .card:hover {
-            border-color: #006BFF;
+            border-color:#1E3A8A;
             box-shadow: 0 8px 30px rgba(0,107,255,0.1);
             transform: translateY(-3px);
         }
 
         .step-line {
-            background: linear-gradient(90deg, #006BFF, #7B61FF);
+            background: linear-gradient(90deg, #1E3A8A, #7B61FF);
         }
 
         @keyframes float {

@@ -46,4 +46,22 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // Un utilisateur a plusieurs services
+public function services()
+{
+    return $this->hasMany(Service::class);
+}
+
+// Un utilisateur a plusieurs rendez-vous
+public function appointments()
+{
+    return $this->hasMany(Appointment::class);
+}
+
+// Un utilisateur a plusieurs créneaux
+public function timeSlots()
+{
+    return $this->hasMany(TimeSlot::class);
+}
 }
