@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\TimeSlot;
 
+
 class TimeSlotController extends Controller
 {
+     
     public function index()
     {
         $days = [
@@ -57,17 +59,23 @@ class TimeSlotController extends Controller
         return back()->with('success', 'Créneau ajouté !');
     }
 
-    public function destroy(TimeSlot $timeSlot)
-    {
-        $this->authorize('delete', $timeSlot);
-        $timeSlot->delete();
-        return back()->with('success', 'Créneau supprimé !');
+ public function destroy(TimeSlot $timeSlot)
+{
+    if ($timeSlot->user_id !== auth()->id()) {
+        abort(403);
     }
+    $timeSlot->delete();
+    return redirect()->route('timeslots.index')
+        ->with('success', 'Créneau supprimé !');
+}
 
-    public function toggle(TimeSlot $timeSlot)
-    {
-        $this->authorize('update', $timeSlot);
-        $timeSlot->update(['is_available' => !$timeSlot->is_available]);
-        return back()->with('success', 'Statut mis à jour !');
+public function toggle(TimeSlot $timeSlot)
+{
+    if ($timeSlot->user_id !== auth()->id()) {
+        abort(403);
     }
+    $timeSlot->update(['is_available' => !$timeSlot->is_available]);
+    return redirect()->route('timeslots.index')
+        ->with('success', 'Statut mis à jour !');
+}
 }

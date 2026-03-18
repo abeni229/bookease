@@ -5,7 +5,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TimeSlotController;
-use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\AppointmentController; 
+use App\Http\Controllers\StatisticsController;
 
 // Page d'accueil
 Route::get('/', function () {
@@ -39,9 +40,10 @@ Route::middleware('auth')->group(function () {
 
     // Créneaux
     Route::resource('timeslots', TimeSlotController::class)
-        ->except(['show', 'edit', 'create', 'update']);
+    ->except(['show', 'edit', 'create', 'update'])
+    ->parameters(['timeslots' => 'timeSlot']);
     Route::patch('timeslots/{timeSlot}/toggle', [TimeSlotController::class, 'toggle'])
-        ->name('timeslots.toggle');
+    ->name('timeslots.toggle');
 
     // Rendez-vous
     Route::resource('appointments', AppointmentController::class)
@@ -50,6 +52,11 @@ Route::middleware('auth')->group(function () {
         ->name('appointments.confirm');
     Route::patch('appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])
         ->name('appointments.cancel');
+
+   
+
+Route::get('statistics', [StatisticsController::class, 'index'])
+    ->name('statistics.index');
 });
 
 require __DIR__.'/auth.php';

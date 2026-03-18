@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Service extends Model
 {
-     use HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'user_id',
@@ -20,13 +20,16 @@ class Service extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
-        'price' => 'decimal:2',
+        'price'     => 'decimal:2',
     ];
 
-    // Un service appartient à un utilisateur
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
+    }
 }

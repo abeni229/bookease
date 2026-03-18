@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Service;
 
+
+
 class ServiceController extends Controller
 {
+    
     public function index()
     {
         $services = Service::where('user_id', auth()->id())
@@ -56,7 +59,9 @@ class ServiceController extends Controller
 
     public function destroy(Service $service)
     {
-        $this->authorize('delete', $service);
+       if ($service->user_id !== auth()->id()) {
+    abort(403);
+}
         $service->delete();
         return redirect()->route('services.index')
             ->with('success', 'Service supprimé !');
@@ -64,7 +69,9 @@ class ServiceController extends Controller
 
     public function toggle(Service $service)
     {
-        $this->authorize('update', $service);
+        if ($service->user_id !== auth()->id()) {
+    abort(403);
+}
         $service->update(['is_active' => !$service->is_active]);
         return back()->with('success', 'Statut mis à jour !');
     }

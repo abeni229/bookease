@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
 use Illuminate\Http\Request;
 use App\Models\Appointment;
  
 
 class AppointmentController extends Controller
 {
-    use AuthorizesRequests;
+  
     public function index(Request $request)
     {
        
@@ -44,21 +44,27 @@ class AppointmentController extends Controller
 
     public function confirm(Appointment $appointment)
     {
-        $this->authorize('update', $appointment);
+       if ($appointment->user_id !== auth()->id()) {
+    abort(403);
+}
         $appointment->update(['status' => 'confirmed']);
         return back()->with('success', 'Rendez-vous confirmé !');
     }
 
     public function cancel(Appointment $appointment)
     {
-        $this->authorize('update', $appointment);
+        if ($appointment->user_id !== auth()->id()) {
+    abort(403);
+}
         $appointment->update(['status' => 'cancelled']);
         return back()->with('success', 'Rendez-vous annulé.');
     }
 
     public function destroy(Appointment $appointment)
     {
-        $this->authorize('delete', $appointment);
+       if ($appointment->user_id !== auth()->id()) {
+    abort(403);
+}
         $appointment->delete();
         return back()->with('success', 'Rendez-vous supprimé !');
     }

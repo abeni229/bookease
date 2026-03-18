@@ -8,6 +8,8 @@ use App\Models\Service;
 use App\Models\Appointment;
 use App\Models\TimeSlot;
 use Carbon\Carbon;
+use App\Mail\AppointmentConfirmed;
+use Illuminate\Support\Facades\Mail;
 
 class BookingController extends Controller
 {
@@ -73,6 +75,10 @@ class BookingController extends Controller
             'end_time'     => $end->format('H:i'),
             'status'       => 'pending',
         ]);
+
+       // Envoyer email de confirmation
+    Mail::to($appointment->client_email)
+        ->send(new AppointmentConfirmed($appointment->load(['service', 'user'])));
 
         return redirect()->route('booking.confirmation', $appointment->id);
     }
