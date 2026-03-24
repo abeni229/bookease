@@ -317,40 +317,50 @@
     }
 
     function loadSlots(date) {
-        if (!date) return;
-        selectedSlot = null;
-        document.getElementById('btn-step-2').disabled = true;
-        document.getElementById('slots-container').classList.add('hidden');
-        document.getElementById('slots-empty').classList.add('hidden');
-        document.getElementById('slots-loading').classList.remove('hidden');
+    if (!date) return;
+    selectedSlot = null;
+    document.getElementById('btn-step-2').disabled = true;
+    document.getElementById('slots-container').classList.add('hidden');
+    document.getElementById('slots-empty').classList.add('hidden');
+    document.getElementById('slots-loading').classList.remove('hidden');
 
-        fetch(`{{ route('booking.slots', $pro->id) }}?date=${date}`)
-            .then(r => r.json())
-            .then(slots => {
-                document.getElementById('slots-loading').classList.add('hidden');
-                const grid = document.getElementById('slots-grid');
-                grid.innerHTML = '';
+    fetch(`{{ route('booking.slots', $pro->id) }}?date=${date}`)
+        .then(r => r.json())
+        .then(slots => {
+            document.getElementById('slots-loading').classList.add('hidden');
+            const grid = document.getElementById('slots-grid');
+            grid.innerHTML = '';
 
-                if (slots.length === 0) {
-                    document.getElementById('slots-empty').classList.remove('hidden');
-                    return;
-                }
-
-                document.getElementById('slots-container').classList.remove('hidden');
-                slots.forEach(slot => {
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'slot-btn py-2.5 px-3 rounded-xl text-sm font-medium text-center';
-                    btn.textContent = slot.start_time.substring(0, 5);
-                    btn.onclick = () => selectSlot(slot.start_time, btn);
-                    grid.appendChild(btn);
-                });
-            })
-            .catch(() => {
-                document.getElementById('slots-loading').classList.add('hidden');
+            if (slots.length === 0) {
                 document.getElementById('slots-empty').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('slots-container').classList.remove('hidden');
+            slots.forEach(slot => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                const time = slot.start_time.substring(0, 5);
+
+                if (slot.booked) {
+                    // Créneau pris
+                    btn.className = 'slot-btn booked py-2.5 px-3 rounded-xl text-sm font-medium text-center relative';
+                    btn.innerHTML = `${time}<span class="block text-xs text-gray-400">Pris</span>`;
+                    btn.disabled = true;
+                } else {
+                    // Créneau disponible
+                    btn.className = 'slot-btn py-2.5 px-3 rounded-xl text-sm font-medium text-center';
+                    btn.innerHTML = `${time}<span class="block text-xs text-green-500">Libre</span>`;
+                    btn.onclick = () => selectSlot(slot.start_time, btn);
+                }
+                grid.appendChild(btn);
             });
-    }
+        })
+        .catch(() => {
+            document.getElementById('slots-loading').classList.add('hidden');
+            document.getElementById('slots-empty').classList.remove('hidden');
+        });
+}
 
     function selectSlot(time, btn) {
         selectedSlot = time;

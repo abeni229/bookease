@@ -97,9 +97,9 @@
                     <h3 class="font-semibold text-gray-900">Prochains rendez-vous</h3>
                     <p class="text-xs text-gray-400 mt-0.5">Les 5 prochains RDV à venir</p>
                 </div>
-                <a href="#" class="text-[#1E3A8A] hover:text-[#1D4ED8] text-sm font-medium transition-colors">
-                    Voir tout →
-                </a>
+             <a href="{{ route('appointments.index') }}" class="text-[#1E3A8A] hover:text-[#1D4ED8] text-sm font-medium transition-colors">
+                Voir tout →
+            </a>
             </div>
 
             @if($upcoming->isEmpty())
@@ -178,8 +178,8 @@
                 <p class="text-blue-200 text-sm mt-1">Partagez ce lien à vos clients pour qu'ils réservent directement</p>
             </div>
             <div class="flex items-center gap-2 bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 min-w-0">
-                <span class="text-blue-100 text-sm truncate">bookease.app/{{ auth()->user()->id }}</span>
-                <button onclick="navigator.clipboard.writeText('bookease.app/{{ auth()->user()->id }}')"
+               <span class="text-blue-100 text-sm truncate">{{ url('/reserver/'.auth()->user()->id) }}</span>
+                <button onclick="navigator.clipboard.writeText('{{ url('/reserver/'.auth()->user()->id) }}')"
                     class="text-white hover:text-blue-200 flex-shrink-0 transition-colors ml-2">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>

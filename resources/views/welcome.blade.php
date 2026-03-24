@@ -228,6 +228,92 @@
     </div>
 </section>
 
+{{-- TARIFS --}}
+<section id="pricing" class="py-24 bg-white">
+    <div class="max-w-5xl mx-auto px-6">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
+                Tarifs simples et transparents
+            </h2>
+            <p class="text-gray-500 text-lg font-light">Commencez gratuitement, évoluez selon vos besoins</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            {{-- Gratuit --}}
+            <div class="bg-white rounded-2xl border border-gray-200 p-8">
+                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Gratuit</p>
+                <div class="flex items-baseline gap-1 mb-6">
+                    <span class="text-4xl font-extrabold text-gray-900">0</span>
+                    <span class="text-gray-500">FCFA/mois</span>
+                </div>
+                <ul class="space-y-3 mb-8">
+                    @foreach(['1 service', '10 RDV/mois', 'Page de réservation', 'Emails de confirmation', 'Dashboard basique'] as $feature)
+                    <li class="flex items-center gap-2 text-sm text-gray-600">
+                        <svg class="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        {{ $feature }}
+                    </li>
+                    @endforeach
+                </ul>
+                <a href="{{ route('register') }}" class="block w-full text-center border border-gray-200 text-gray-700 hover:bg-gray-50 font-semibold px-6 py-3 rounded-xl transition-all text-sm">
+                    Commencer gratuitement
+                </a>
+            </div>
+
+            {{-- Pro -- recommandé --}}
+            <div class="bg-[#1E3A8A] rounded-2xl p-8 relative shadow-xl">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span class="bg-yellow-400 text-yellow-900 text-xs font-bold px-4 py-1 rounded-full">
+                        Recommandé
+                    </span>
+                </div>
+                <p class="text-sm font-semibold text-blue-300 uppercase tracking-wide mb-2">Pro</p>
+                <div class="flex items-baseline gap-1 mb-6">
+                    <span class="text-4xl font-extrabold text-white">5 000</span>
+                    <span class="text-blue-300">FCFA/mois</span>
+                </div>
+                <ul class="space-y-3 mb-8">
+                    @foreach(['Services illimités', 'RDV illimités', 'Page de réservation', 'Emails automatiques', 'Dashboard complet', 'Statistiques avancées', 'Support prioritaire'] as $feature)
+                    <li class="flex items-center gap-2 text-sm text-blue-100">
+                        <svg class="w-4 h-4 text-yellow-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        {{ $feature }}
+                    </li>
+                    @endforeach
+                </ul>
+                <a href="{{ route('register') }}" class="block w-full text-center bg-white text-[#1E3A8A] hover:bg-blue-50 font-bold px-6 py-3 rounded-xl transition-all text-sm">
+                    Essayer 30 jours gratuit
+                </a>
+            </div>
+
+            {{-- Entreprise --}}
+            <div class="bg-white rounded-2xl border border-gray-200 p-8">
+                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Entreprise</p>
+                <div class="flex items-baseline gap-1 mb-6">
+                    <span class="text-4xl font-extrabold text-gray-900">Sur devis</span>
+                </div>
+                <ul class="space-y-3 mb-8">
+                    @foreach(['Multi-utilisateurs', 'Domaine personnalisé', 'Intégrations sur mesure', 'API dédiée', 'Support 24/7', 'Formation incluse', 'SLA garanti'] as $feature)
+                    <li class="flex items-center gap-2 text-sm text-gray-600">
+                        <svg class="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        {{ $feature }}
+                    </li>
+                    @endforeach
+                </ul>
+                <a href="#contact" class="block w-full text-center border border-gray-200 text-gray-700 hover:bg-gray-50 font-semibold px-6 py-3 rounded-xl transition-all text-sm">
+                    Nous contacter
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
+
 {{-- CTA FINAL --}}
 <section class="py-24 bg-[#006BFF]">
     <div class="max-w-3xl mx-auto px-6 text-center">

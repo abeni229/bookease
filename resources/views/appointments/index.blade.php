@@ -24,6 +24,9 @@
         .badge-cancelled { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
         .rdv-row { transition: all 0.15s; }
         .rdv-row:hover { background: #F8FAFF; }
+        .modal { display: none; position: fixed; inset: 0; z-index: 50; align-items: center; justify-content: center; }
+        .modal.open { display: flex; }
+        .input-field { width: 100%; }
     </style>
 </head>
 
@@ -71,23 +74,24 @@
 
             {{-- Filtres --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-                <form method="GET" action="{{ route('appointments.index') }}" class="flex flex-wrap gap-3">
-                    <input type="text" name="search" value="{{ request('search') }}"
-                        class="input-field flex-1 min-w-40"
-                        placeholder="Rechercher un client...">
-                    <input type="date" name="date" value="{{ request('date') }}"
-                        class="input-field">
-                    <select name="status" class="input-field">
-                        <option value="">Tous les statuts</option>
-                        <option value="pending"   {{ request('status') === 'pending'    ? 'selected' : '' }}>En attente</option>
-                        <option value="confirmed" {{ request('status') === 'confirmed'  ? 'selected' : '' }}>Confirmés</option>
-                        <option value="cancelled" {{ request('status') === 'cancelled'  ? 'selected' : '' }}>Annulés</option>
-                    </select>
-                    <button type="submit" class="bg-[#1E3A8A] text-white px-5 py-2 rounded-xl text-sm font-medium hover:bg-[#1D4ED8] transition-all">
-                        Filtrer
-                    </button>
-                    @if(request()->hasAny(['search','date','status']))
-                    <a href="{{ route('appointments.index') }}" class="text-gray-400 hover:text-gray-600 px-3 py-2 rounded-xl text-sm transition-colors">
+              <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+    <form method="GET" action="{{ route('appointments.index') }}" class="flex flex-row items-center gap-3">
+        <input type="text" name="search" value="{{ request('search') }}"
+            class="input-field flex-1"
+            placeholder="Rechercher un client...">
+        <input type="date" name="date" value="{{ request('date') }}"
+            class="input-field w-44">
+        <select name="status" class="input-field w-44">
+            <option value="">Tous les statuts</option>
+            <option value="pending"   {{ request('status') === 'pending'    ? 'selected' : '' }}>En attente</option>
+            <option value="confirmed" {{ request('status') === 'confirmed'  ? 'selected' : '' }}>Confirmés</option>
+            <option value="cancelled" {{ request('status') === 'cancelled'  ? 'selected' : '' }}>Annulés</option>
+        </select>
+        <button type="submit" class="bg-[#1E3A8A] text-white px-5 py-2 rounded-xl text-sm font-medium hover:bg-[#1D4ED8] transition-all">
+            Filtrer
+        </button>
+        @if(request()->hasAny(['search','date','status']))
+        <a href="{{ route('appointments.index') }}" class="text-gray-400 hover:text-gray-600 px-3 py-2 rounded-xl text-sm transition-colors">
                         Réinitialiser
                     </a>
                     @endif
@@ -180,18 +184,17 @@
                                         </form>
                                         @endif
 
-                                        {{-- Annuler --}}
-                                        @if($rdv->status !== 'cancelled')
-                                        <form method="POST" action="{{ route('appointments.cancel', $rdv) }}">
-                                            @csrf @method('PATCH')
-                                            <button type="submit" title="Annuler"
+                                      {{-- Annuler --}}
+                                       {{-- Annuler --}}
+                                            @if($rdv->status !== 'cancelled')
+                                            <button onclick="openCancelModal({{ $rdv->id }})"
+                                                title="Annuler"
                                                 class="p-1.5 text-yellow-500 hover:bg-yellow-50 rounded-lg transition-all">
                                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
                                                 </svg>
                                             </button>
-                                        </form>
-                                        @endif
+                                            @endif
 
                                         {{-- Supprimer --}}
                                         <form method="POST" action="{{ route('appointments.destroy', $rdv) }}"
@@ -223,5 +226,56 @@
 
         </div>
     </div>
+    {{-- MODAL ANNULATION --}}
+<div class="modal" id="modal-cancel">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeModal('modal-cancel')"></div>
+    <div class="relative m-auto bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
+        <div class="flex items-center justify-between mb-5">
+            <h3 class="font-bold text-gray-900 text-lg">Annuler le rendez-vous</h3>
+            <button onclick="closeModal('modal-cancel')" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-3 mb-4 text-sm text-yellow-700">
+            ⚠️ Le client recevra un email d'annulation avec le motif indiqué.
+        </div>
+
+       <form method="POST" id="cancel-form" class="space-y-4">
+    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="_method" value="PATCH">
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+            Motif de l'annulation <span class="text-gray-400 font-normal">(optionnel)</span>
+        </label>
+        <textarea name="reason" rows="3"
+            class="input-field"
+            placeholder="Ex: Indisponibilité, problème technique, fermeture exceptionnelle..."></textarea>
+    </div>
+    <div class="flex gap-3">
+        <button type="button" onclick="closeModal('modal-cancel')"
+            class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50 transition-all">
+            Retour
+        </button>
+        <button type="submit"
+            class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-xl text-sm font-medium transition-all">
+            Confirmer l'annulation
+        </button>
+    </div>
+</form>
+    </div>
+</div>
+<script>
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+ function openCancelModal(id) {
+    document.getElementById('cancel-form').action = `/appointments/${id}/cancel`;
+    openModal('modal-cancel');
+}
+</script>
+
 
 </x-app-layout>

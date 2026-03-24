@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Appointment;
+use App\Mail\AppointmentCancelled;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AppointmentCancelledClient;
  
 
 class AppointmentController extends Controller
 {
   
-    public function index(Request $request)
+    public function index(RRequest $request)
     {
        
         $query = Appointment::where('user_id', auth()->id())
@@ -51,14 +54,30 @@ class AppointmentController extends Controller
         return back()->with('success', 'Rendez-vous confirmé !');
     }
 
-    public function cancel(Appointment $appointment)
-    {
-        if ($appointment->user_id !== auth()->id()) {
-    abort(403);
-}
-        $appointment->update(['status' => 'cancelled']);
-        return back()->with('success', 'Rendez-vous annulé.');
+
+public function cancel(Appointment $appointment, Request $request)
+{
+    if ($appointment->user_id !== auth()->id()) {
+        abort(403);
     }
+
+    $appointment->update([
+        'status' => 'cancelled',
+        'cancellation_reason' => $request->reason ?? '',
+    ]);
+
+    $appointment->load(['service', 'user']);
+
+    // Email au professionnel
+    Mail::to($appointment->user->email)
+        ->send(new AppointmentCancelled($appointment));
+
+    // Email au client avec motif
+    Mail::to($appointment->client_email)
+        ->send(new AppointmentCancelledClient($appointment, $request->reason ?? ''));
+
+    return back()->with('success', 'Rendez-vous annulé.');
+}
 
     public function destroy(Appointment $appointment)
     {
