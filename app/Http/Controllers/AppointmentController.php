@@ -13,7 +13,7 @@ use App\Mail\AppointmentCancelledClient;
 class AppointmentController extends Controller
 {
   
-    public function index(RRequest $request)
+    public function index(Request $request)
     {
        
         $query = Appointment::where('user_id', auth()->id())

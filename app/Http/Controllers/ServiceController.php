@@ -20,11 +20,13 @@ class ServiceController extends Controller
 
     public function store(Request $request)
     {
+        $validationRules = config('security.validation');
+
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'duration'    => 'required|integer|min:5',
-            'price'       => 'required|numeric|min:0',
+            'name'        => 'required|string|max:' . $validationRules['max_name_length'] . '|regex:/^[a-zA-ZÀ-ÿ0-9\s\-\'\.\,\(\)]+$/',
+            'description' => 'nullable|string|max:' . $validationRules['max_description_length'],
+            'duration'    => 'required|integer|min:' . $validationRules['min_duration'] . '|max:' . $validationRules['max_duration'],
+            'price'       => 'required|numeric|min:0|max:' . $validationRules['max_price'],
         ]);
 
         Service::create([
@@ -44,14 +46,16 @@ class ServiceController extends Controller
     {
         $this->authorize('update', $service);
 
+        $validationRules = config('security.validation');
+
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'duration'    => 'required|integer|min:5',
-            'price'       => 'required|numeric|min:0',
+            'name'        => 'required|string|max:' . $validationRules['max_name_length'] . '|regex:/^[a-zA-ZÀ-ÿ0-9\s\-\'\.\,\(\)]+$/',
+            'description' => 'nullable|string|max:' . $validationRules['max_description_length'],
+            'duration'    => 'required|integer|min:' . $validationRules['min_duration'] . '|max:' . $validationRules['max_duration'],
+            'price'       => 'required|numeric|min:0|max:' . $validationRules['max_price'],
         ]);
 
-        $service->update($request->all());
+        $service->update($request->only(['name', 'description', 'duration', 'price']));
 
         return redirect()->route('services.index')
             ->with('success', 'Service mis à jour !');

@@ -40,6 +40,7 @@
                 <h2 class="text-xl font-bold text-gray-900">Mes services</h2>
                 <p class="text-sm text-gray-500 mt-0.5">Gérez les prestations proposées à vos clients</p>
             </div>
+        
             <button onclick="openModal('modal-create')"
                 class="btn-primary flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -50,7 +51,7 @@
         </div>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-8">**
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
             {{-- Alerts --}}

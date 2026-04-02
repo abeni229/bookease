@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <title>Réserver avec {{ $pro->name }} — BookEase</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -268,6 +272,8 @@
                 <div class="px-5 pb-5">
                     <form method="POST" action="{{ route('booking.store', $pro->id) }}" id="booking-form">
                         @csrf
+                        <input type="hidden" name="timestamp" value="{{ time() }}">
+                        <input type="text" name="website" style="display:none !important;" tabindex="-1" autocomplete="off">
                         <input type="hidden" name="service_id" id="form-service-id">
                         <input type="hidden" name="date" id="form-date">
                         <input type="hidden" name="start_time" id="form-start-time">

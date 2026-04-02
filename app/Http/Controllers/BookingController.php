@@ -51,16 +51,47 @@ class BookingController extends Controller
     // Enregistrer la réservation
     public function store(Request $request, $userId)
     {
+        $validationRules = config('security.validation');
+
         $request->validate([
             'service_id'   => 'required|exists:services,id',
-            'date'         => 'required|date|after_or_equal:today',
-            'start_time'   => 'required',
-            'client_name'  => 'required|string|max:255',
-            'client_email' => 'required|email',
-            'client_phone' => 'nullable|string|max:20',
+            'date'         => 'required|date|after_or_equal:today|before_or_equal:' . now()->addDays($validationRules['max_future_booking_days'])->format('Y-m-d'),
+            'start_time'   => 'required|date_format:H:i',
+            'client_name'  => 'required|string|max:' . $validationRules['max_name_length'] . '|regex:/^[a-zA-ZÀ-ÿ\s\-\'\.]+$/',
+            'client_email' => 'required|email:rfc,dns|max:' . $validationRules['max_name_length'],
+            'client_phone' => 'nullable|string|max:' . $validationRules['max_phone_length'] . '|regex:/^[\+]?[0-9\s\-\(\)]+$/',
+            'timestamp'    => 'required|integer',
         ]);
 
-        $service = Service::findOrFail($request->service_id);
+        // Vérifier que le service appartient bien à l'utilisateur
+        $service = Service::where('id', $request->service_id)
+            ->where('user_id', $userId)
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        // Vérifier que le créneau est disponible
+        $existingAppointment = Appointment::where('user_id', $userId)
+            ->where('date', $request->date)
+            ->where('start_time', $request->start_time)
+            ->where('status', '!=', 'cancelled')
+            ->exists();
+
+        if ($existingAppointment) {
+            return back()->withErrors(['slot' => 'Ce créneau n\'est plus disponible.'])->withInput();
+        }
+
+        // Vérifier que le créneau existe dans les disponibilités
+        $dayOfWeek = Carbon::parse($request->date)->englishDayOfWeek;
+        $timeSlot = TimeSlot::where('user_id', $userId)
+            ->where('day_of_week', strtolower($dayOfWeek))
+            ->where('start_time', $request->start_time)
+            ->where('is_available', true)
+            ->first();
+
+        if (!$timeSlot) {
+            return back()->withErrors(['slot' => 'Ce créneau n\'est pas disponible.'])->withInput();
+        }
+
         $start = Carbon::parse($request->start_time);
         $end = $start->copy()->addMinutes($service->duration);
 

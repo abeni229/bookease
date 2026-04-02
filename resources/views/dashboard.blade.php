@@ -10,7 +10,25 @@
         .badge-confirmed { background: #DCFCE7; color: #16A34A; }
         .badge-pending { background: #FEF9C3; color: #CA8A04; }
         .badge-cancelled { background: #FEE2E2; color: #DC2626; }
-    </style>
+
+                @keyframes pop {
+                    0% { transform: scale(0.8); opacity: 0; }
+                    100% { transform: scale(1); opacity: 1; }
+                }
+                .animate-pop {
+                    animation: pop 0.18s cubic-bezier(.4,1.4,.6,1) both;
+                }
+                .share-menu-content {
+                    box-shadow: 0 8px 32px rgba(30,58,138,0.13), 0 1.5px 6px rgba(30,58,138,0.07);
+                }
+                .share-icon:hover img {
+                    transform: scale(1.18) rotate(-6deg);
+                    filter: grayscale(0) drop-shadow(0 2px 8px rgba(30,58,138,0.10));
+                }
+                .close-share-menu {
+                    cursor: pointer;
+                }
+        </style>
 </head>
 
 <x-slot name="header">
@@ -21,12 +39,7 @@
             </h2>
             <p class="text-sm text-gray-500 mt-0.5">{{ $today }}</p>
         </div>
-        <a href="#" class="bg-[#1E3A8A] hover:bg-[#1D4ED8] text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-all flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Nouveau RDV
-        </a>
+       
     </div>
 </x-slot>
 
@@ -111,9 +124,35 @@
                 </div>
                 <p class="text-gray-500 font-medium">Aucun rendez-vous à venir</p>
                 <p class="text-gray-400 text-sm mt-1">Partagez votre lien de réservation pour recevoir vos premiers RDV</p>
-                <a href="#" class="inline-block mt-4 bg-[#1E3A8A] text-white text-sm px-5 py-2.5 rounded-lg hover:bg-[#1D4ED8] transition-all">
+                <button type="button" class="share-link-btn inline-block mt-4 bg-[#1E3A8A] text-white text-sm px-5 py-2.5 rounded-lg hover:bg-[#1D4ED8] transition-all">
                     Partager mon lien
-                </a>
+                </button>
+                <!-- Menu de partage réseaux sociaux (sera cloné dynamiquement) -->
+                <div class="share-menu-template" style="display:none;">
+                    <div class="share-menu-content bg-white rounded-2xl shadow-2xl p-5 flex flex-col items-center gap-3 animate-pop relative" style="min-width:220px;">
+                        <button type="button" class="close-share-menu absolute top-2 right-2 text-gray-400 hover:text-gray-700 transition-colors" title="Fermer" style="background:none;border:none;padding:0;">
+                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                        <span class="text-xs text-gray-500 mb-1">Partager sur</span>
+                        <div class="flex gap-3">
+                            <a data-share="facebook" href="#" target="_blank" class="share-icon" title="Facebook" style="transition:transform 0.15s;">
+                                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/facebook.svg" alt="Facebook" style="width:32px;height:32px;filter:grayscale(0.2);">
+                            </a>
+                            <a data-share="whatsapp" href="#" target="_blank" class="share-icon" title="WhatsApp" style="transition:transform 0.15s;">
+                                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/whatsapp.svg" alt="WhatsApp" style="width:32px;height:32px;filter:grayscale(0.2);">
+                            </a>
+                            <a data-share="linkedin" href="#" target="_blank" class="share-icon" title="LinkedIn" style="transition:transform 0.15s;">
+                                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/linkedin.svg" alt="LinkedIn" style="width:32px;height:32px;filter:grayscale(0.2);">
+                            </a>
+                            <a data-share="tiktok" href="#" target="_blank" class="share-icon" title="TikTok" style="transition:transform 0.15s;">
+                                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/tiktok.svg" alt="TikTok" style="width:32px;height:32px;filter:grayscale(0.2);">
+                            </a>
+                            <a data-share="twitter" href="#" target="_blank" class="share-icon" title="Twitter" style="transition:transform 0.15s;">
+                                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/x.svg" alt="Twitter/X" style="width:32px;height:32px;filter:grayscale(0.2);">
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
             @else
             <div class="divide-y divide-gray-50">
@@ -191,3 +230,53 @@
     </div>
 </div>
 </x-app-layout>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const shareUrl = "{{ url('/reserver/'.auth()->user()->id) }}";
+    const shareText = encodeURIComponent("Réservez votre rendez-vous avec moi sur BookEase !");
+
+    // Fonction pour générer les liens de partage
+    function setShareLinks(menu) {
+        menu.querySelector('[data-share="facebook"]').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+        menu.querySelector('[data-share="whatsapp"]').href = `https://wa.me/?text=${encodeURIComponent(shareUrl)}`;
+        menu.querySelector('[data-share="linkedin"]').href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+        menu.querySelector('[data-share="tiktok"]').href = `https://www.tiktok.com/share?url=${encodeURIComponent(shareUrl)}&text=${shareText}`;
+        menu.querySelector('[data-share="twitter"]').href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${shareText}`;
+    }
+
+    // Gestion de tous les boutons "Partager mon lien"
+    document.querySelectorAll('.share-link-btn').forEach(function(btn) {
+        let menu = null;
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Fermer tous les autres menus
+            document.querySelectorAll('.share-menu').forEach(m => m.remove());
+            // Créer un nouveau menu à partir du template
+            const template = document.querySelector('.share-menu-template');
+            menu = template.cloneNode(true);
+            menu.classList.remove('share-menu-template');
+            menu.classList.add('share-menu');
+            menu.style.display = 'block';
+            setShareLinks(menu);
+            // Ajout gestion fermeture
+            menu.querySelector('.close-share-menu').onclick = function(ev) {
+                ev.stopPropagation();
+                menu.remove();
+            };
+            // Insérer le menu juste après le bouton
+            btn.parentNode.insertBefore(menu, btn.nextSibling);
+        });
+    });
+
+    // Fermer le menu si clic en dehors
+    document.addEventListener('click', function(e) {
+        // Si clic sur un bouton de partage, ne rien faire
+        if (e.target.closest('.share-link-btn')) return;
+        // Si clic dans le menu, ne rien faire
+        if (e.target.closest('.share-menu')) return;
+        // Sinon, fermer tous les menus
+        document.querySelectorAll('.share-menu').forEach(m => m.remove());
+    });
+});
+</script>

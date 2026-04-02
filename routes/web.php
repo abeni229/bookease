@@ -14,10 +14,18 @@ Route::get('/', function () {
 });
 
 // Pages de réservation publiques
-Route::get('/reserver/{userId}', [BookingController::class, 'index'])->name('booking.index');
-Route::get('/reserver/{userId}/slots', [BookingController::class, 'getSlots'])->name('booking.slots');
-Route::post('/reserver/{userId}', [BookingController::class, 'store'])->name('booking.store');
-Route::get('/confirmation/{appointmentId}', [BookingController::class, 'confirmation'])->name('booking.confirmation');
+Route::get('/reserver/{userId}', [BookingController::class, 'index'])
+    ->middleware(['throttle:booking.index', 'spam.protection'])
+    ->name('booking.index');
+Route::get('/reserver/{userId}/slots', [BookingController::class, 'getSlots'])
+    ->middleware(['throttle:booking.slots', 'spam.protection'])
+    ->name('booking.slots');
+Route::post('/reserver/{userId}', [BookingController::class, 'store'])
+    ->middleware(['throttle:booking.store', 'spam.protection'])
+    ->name('booking.store');
+Route::get('/confirmation/{appointmentId}', [BookingController::class, 'confirmation'])
+    ->middleware(['throttle:booking.index', 'spam.protection'])
+    ->name('booking.confirmation');
 
 // Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -53,10 +61,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])
         ->name('appointments.cancel');
 
-   
+    // Mise à niveau de l'abonnement
+    Route::post('/subscription/upgrade', [DashboardController::class, 'upgradeSubscription'])
+        ->middleware('auth')
+        ->name('subscription.upgrade');
+});
 
 Route::get('statistics', [StatisticsController::class, 'index'])
     ->name('statistics.index');
-});
 
 require __DIR__.'/auth.php';

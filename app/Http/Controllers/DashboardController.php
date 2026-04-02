@@ -33,4 +33,13 @@ class DashboardController extends Controller
             $today = Carbon::now()->isoFormat('dddd D MMMM YYYY');
             return view('dashboard', compact('stats', 'upcoming', 'today'));
     }
+
+    public function upgradeSubscription(Request $request)
+    {
+        $user = $request->user();
+        $user->plan = 'premium';
+        $user->save();
+
+        return redirect()->route('dashboard')->with('success', 'Votre abonnement a été mis à niveau vers Premium.');
+    }
 }

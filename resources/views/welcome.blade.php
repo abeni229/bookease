@@ -207,7 +207,7 @@
             <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Opérationnel en 3 étapes</h2>
             <p class="text-gray-500 text-lg font-light">Moins de 5 minutes pour commencer</p>
         </div>
-
+.
         <div class="space-y-6">
             @foreach([
                 ['01', 'Créez votre espace gratuit', 'Inscrivez-vous, configurez vos services, vos horaires et vos disponibilités en quelques clics.', 'bg-blue-50 text-blue-600'],
@@ -351,7 +351,7 @@
                     <div class="space-y-2">
                         <a href="#features" class="block text-gray-500 hover:text-gray-300 text-sm transition-colors">Fonctionnalités</a>
                         <a href="#how" class="block text-gray-500 hover:text-gray-300 text-sm transition-colors">Comment ça marche</a>
-                        <a href="#" class="block text-gray-500 hover:text-gray-300 text-sm transition-colors">Tarifs</a>
+                        <a href="#pricing" class="block text-gray-500 hover:text-gray-300 text-sm transition-colors">Tarifs</a>
                     </div>
                 </div>
                 <div>
