@@ -35,6 +35,9 @@ class AppServiceProvider extends ServiceProvider
     Gate::policy(Service::class, ServicePolicy::class);
     Gate::policy(TimeSlot::class, TimeSlotPolicy::class);
 
+     if (env('APP_ENV') === 'production') {
+        Artisan::call('migrate', ['--force' => true]);
+    }
     $this->configureRateLimiting();
 }
 
