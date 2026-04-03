@@ -32,4 +32,4 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 
 EXPOSE 80
 
-CMD php artisan config:cache && php artisan migrate --force && apache2-foreground
+CMD php artisan config:cache && apache2-foreground
